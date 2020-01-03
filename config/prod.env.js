@@ -1,6 +1,6 @@
 'use strict'
 module.exports = {
   NODE_ENV: '"production"',
-  BASE_API: '"http://maweitao.top/oes/api"',
-  BASE_WEBSOCKET: '"ws://maweitao.top:8080/oes/api/websocket/"'
+  BASE_API: '"http://51ctofx.com/oes/api"',
+  BASE_WEBSOCKET: '"ws://51ctofx.com:8080/oes/api/websocket/"'
 }

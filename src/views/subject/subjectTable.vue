@@ -101,7 +101,7 @@
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
             class="avatar-uploader"
-            action="/api/teacher/uploadPicture">
+            action="/oes/api/teacher/uploadPicture">
             <img v-if="temp.langImgSrc" :src="temp.langImgSrc" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"/>
           </el-upload>
@@ -143,222 +143,222 @@
 </template>
 
 <script>
-import { reqGetSubjectsList, reqSearchSubjectsList, reqDeleteSubject, reqInsertSubjectInfo, reqUpdateSubjectInfo } from '@/api/subject'
-import waves from '@/directive/waves' // Waves directive
-import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
-import BackToTop from '@/components/BackToTop'
-export default {
-  name: 'SubjectTable',
-  components: { Pagination, BackToTop },
-  directives: { waves },
-  data() {
-    return {
-      tableKey: 0,
-      list: null,
-      previewList: [],
-      total: 0,
-      listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 10,
-        langName: undefined,
-        langDesc: undefined,
-        langCreatedBy: undefined,
-        isRecommend: undefined
-      },
-      recommendOptions: [{ label: '是', key: '1' }, { label: '否', key: '0' }],
-      temp: {
-        langName: '',
-        langDesc: '',
-        langImgSrc: '',
-        isRecommend: ''
-      },
-      dialogFormVisible: false,
-      dialogStatus: '',
-      dialogRotationImgVisible: false,
-      rules: {
-        langName: [{ required: true, message: '科目名称为必填项', trigger: 'change' }],
-        langDesc: [{ required: true, message: '科目描述为必填项', trigger: 'change' }],
-        langImgSrc: [{ required: true, message: '请上传科目图像', trigger: 'change' }],
-        isRecommend: [{ required: true, message: '是否显示推荐为必选项', trigger: 'change' }]
-      },
-      myBackToTopStyle: {
-        right: '50px',
-        bottom: '50px',
-        width: '40px',
-        height: '40px',
-        'border-radius': '4px',
-        'line-height': '45px', // 请保持与高度一致以垂直居中 Please keep consistent with height to center vertically
-        background: '#e7eaf1'// 按钮的背景颜色 The background color of the button
+  import { reqGetSubjectsList, reqSearchSubjectsList, reqDeleteSubject, reqInsertSubjectInfo, reqUpdateSubjectInfo } from '@/api/subject'
+  import waves from '@/directive/waves' // Waves directive
+  import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+  import BackToTop from '@/components/BackToTop'
+  export default {
+    name: 'SubjectTable',
+    components: { Pagination, BackToTop },
+    directives: { waves },
+    data() {
+      return {
+        tableKey: 0,
+        list: null,
+        previewList: [],
+        total: 0,
+        listLoading: true,
+        listQuery: {
+          page: 1,
+          limit: 10,
+          langName: undefined,
+          langDesc: undefined,
+          langCreatedBy: undefined,
+          isRecommend: undefined
+        },
+        recommendOptions: [{ label: '是', key: '1' }, { label: '否', key: '0' }],
+        temp: {
+          langName: '',
+          langDesc: '',
+          langImgSrc: '',
+          isRecommend: ''
+        },
+        dialogFormVisible: false,
+        dialogStatus: '',
+        dialogRotationImgVisible: false,
+        rules: {
+          langName: [{ required: true, message: '科目名称为必填项', trigger: 'change' }],
+          langDesc: [{ required: true, message: '科目描述为必填项', trigger: 'change' }],
+          langImgSrc: [{ required: true, message: '请上传科目图像', trigger: 'change' }],
+          isRecommend: [{ required: true, message: '是否显示推荐为必选项', trigger: 'change' }]
+        },
+        myBackToTopStyle: {
+          right: '50px',
+          bottom: '50px',
+          width: '40px',
+          height: '40px',
+          'border-radius': '4px',
+          'line-height': '45px', // 请保持与高度一致以垂直居中 Please keep consistent with height to center vertically
+          background: '#e7eaf1'// 按钮的背景颜色 The background color of the button
+        }
       }
-    }
-  },
-  created() {
-    this.getList()
-  },
-  methods: {
-    async getList() {
-      this.listLoading = true
-      const result = await reqGetSubjectsList()
-      if (result.statu === 0) {
-        this.total = result.data.length
-        this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
-      }
-      // 延迟0.5秒等待请求数据
-      setTimeout(() => {
-        this.listLoading = false
-      }, 500)
     },
-    confirmDeleteSubject(row) {
-      this.$confirm('确定删除该科目吗?若该科目下已有发布试卷则无法删除', '提示', {
-        confirmButtonText: '确定删除',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        if (row.paperCount > 0) {
+    created() {
+      this.getList()
+    },
+    methods: {
+      async getList() {
+        this.listLoading = true
+        const result = await reqGetSubjectsList()
+        if (result.statu === 0) {
+          this.total = result.data.length
+          this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
+        }
+        // 延迟0.5秒等待请求数据
+        setTimeout(() => {
+          this.listLoading = false
+        }, 500)
+      },
+      confirmDeleteSubject(row) {
+        this.$confirm('确定删除该科目吗?若该科目下已有发布试卷则无法删除', '提示', {
+          confirmButtonText: '确定删除',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          if (row.paperCount > 0) {
+            this.$message({
+              message: '该科目已有发布试卷，无法删除',
+              type: 'error'
+            })
+          } else {
+            this.deleteSubject(row)
+          }
+        }).catch(() => {
+        })
+      },
+      async deleteSubject(row) {
+        const result = await reqDeleteSubject(row.langId)
+        if (result.statu === 0) {
           this.$message({
-            message: '该科目已有发布试卷，无法删除',
+            message: '删除成功',
+            type: 'success'
+          })
+          this.getList()
+        } else {
+          this.$message({
+            message: result.msg,
             type: 'error'
           })
+        }
+      },
+      async handleFilter() {
+        this.listQuery.page = 1
+        this.listLoading = true
+        let isRecommend = this.listQuery.isRecommend
+        if (this.listQuery.isRecommend === null || this.listQuery.isRecommend === undefined) {
+          isRecommend = undefined
+        }
+        const result = await reqSearchSubjectsList(this.listQuery.langName, this.listQuery.langDesc, this.listQuery.langCreatedBy, isRecommend)
+        if (result.statu === 0) {
+          this.total = result.data.length
+          this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
+        }
+        // 延迟一秒等待请求数据
+        setTimeout(() => {
+          this.listLoading = false
+        }, 500)
+      },
+      resetTemp() {
+        this.temp = {
+          langName: '',
+          langDesc: '',
+          langImgSrc: '',
+          isRecommend: ''
+        }
+      },
+      handleUpdate(row) {
+        this.temp = Object.assign({}, row) // 复制对象
+        this.dialogStatus = '编辑'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
+      },
+      updateData() {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.handleUpdateSubject()
+          }
+        })
+      },
+      async handleUpdateSubject() {
+        const temp = this.temp
+        const admin = this.$store.state.admin.userInfo
+        temp.langLastChanger = admin.admName
+        const result = await reqUpdateSubjectInfo(temp)
+        if (result.statu === 0) {
+          this.dialogFormVisible = false
+          this.$message({
+            message: result.msg,
+            type: 'success'
+          })
+          this.getList()
         } else {
-          this.deleteSubject(row)
+          this.$message({
+            message: result.msg,
+            type: 'error'
+          })
         }
-      }).catch(() => {
-      })
-    },
-    async deleteSubject(row) {
-      const result = await reqDeleteSubject(row.langId)
-      if (result.statu === 0) {
-        this.$message({
-          message: '删除成功',
-          type: 'success'
+      },
+      handleCreate() {
+        this.resetTemp()
+        this.dialogStatus = '添加'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
         })
-        this.getList()
-      } else {
-        this.$message({
-          message: result.msg,
-          type: 'error'
+      },
+      createData() {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.insertSubjectInfo()
+          }
         })
-      }
-    },
-    async handleFilter() {
-      this.listQuery.page = 1
-      this.listLoading = true
-      let isRecommend = this.listQuery.isRecommend
-      if (this.listQuery.isRecommend === null || this.listQuery.isRecommend === undefined) {
-        isRecommend = undefined
-      }
-      const result = await reqSearchSubjectsList(this.listQuery.langName, this.listQuery.langDesc, this.listQuery.langCreatedBy, isRecommend)
-      if (result.statu === 0) {
-        this.total = result.data.length
-        this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
-      }
-      // 延迟一秒等待请求数据
-      setTimeout(() => {
-        this.listLoading = false
-      }, 500)
-    },
-    resetTemp() {
-      this.temp = {
-        langName: '',
-        langDesc: '',
-        langImgSrc: '',
-        isRecommend: ''
-      }
-    },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row) // 复制对象
-      this.dialogStatus = '编辑'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.handleUpdateSubject()
+      },
+      async insertSubjectInfo() {
+        const temp = this.temp
+        const admin = this.$store.state.admin.userInfo
+        temp.langCreatedBy = admin.admName
+        const result = await reqInsertSubjectInfo(temp)
+        if (result.statu === 0) {
+          this.dialogFormVisible = false
+          this.$notify({
+            title: '成功',
+            message: '添加成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.getList()
+        } else {
+          this.$notify({
+            title: '失败',
+            message: result.msg,
+            type: 'error',
+            duration: 2000
+          })
         }
-      })
-    },
-    async handleUpdateSubject() {
-      const temp = this.temp
-      const admin = this.$store.state.admin.userInfo
-      temp.langLastChanger = admin.admName
-      const result = await reqUpdateSubjectInfo(temp)
-      if (result.statu === 0) {
-        this.dialogFormVisible = false
-        this.$message({
-          message: result.msg,
-          type: 'success'
-        })
-        this.getList()
-      } else {
-        this.$message({
-          message: result.msg,
-          type: 'error'
-        })
-      }
-    },
-    handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = '添加'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.insertSubjectInfo()
-        }
-      })
-    },
-    async insertSubjectInfo() {
-      const temp = this.temp
-      const admin = this.$store.state.admin.userInfo
-      temp.langCreatedBy = admin.admName
-      const result = await reqInsertSubjectInfo(temp)
-      if (result.statu === 0) {
-        this.dialogFormVisible = false
-        this.$notify({
-          title: '成功',
-          message: '添加成功',
-          type: 'success',
-          duration: 2000
-        })
-        this.getList()
-      } else {
-        this.$notify({
-          title: '失败',
-          message: result.msg,
-          type: 'error',
-          duration: 2000
-        })
-      }
-    },
-    handleAvatarSuccess(res, file) {
-      // this.temp.pictureSrc = URL.createObjectURL(file.raw)
-      this.temp.langImgSrc = res.data
-    },
-    beforeAvatarUpload(file) {
-      const isType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif'
-      const isLt4M = file.size / 1024 / 1024 < 4
+      },
+      handleAvatarSuccess(res, file) {
+        // this.temp.pictureSrc = URL.createObjectURL(file.raw)
+        this.temp.langImgSrc = res.data
+      },
+      beforeAvatarUpload(file) {
+        const isType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif'
+        const isLt4M = file.size / 1024 / 1024 < 4
 
-      if (!isType) {
-        this.$message.error('上传头像图片只能是 JPG/PNG/GIF 格式!')
+        if (!isType) {
+          this.$message.error('上传头像图片只能是 JPG/PNG/GIF 格式!')
+        }
+        if (!isLt4M) {
+          this.$message.error('上传头像图片大小不能超过 4MB!')
+        }
+        return isType && isLt4M
+      },
+      deletePictureSrc() {
+        this.temp.langImgSrc = ''
       }
-      if (!isLt4M) {
-        this.$message.error('上传头像图片大小不能超过 4MB!')
-      }
-      return isType && isLt4M
-    },
-    deletePictureSrc() {
-      this.temp.langImgSrc = ''
     }
   }
-}
 </script>
 <style rel="stylesheet/scss" lang="scss" type="text/scss" scoped>
   .avatar-uploader .el-upload {

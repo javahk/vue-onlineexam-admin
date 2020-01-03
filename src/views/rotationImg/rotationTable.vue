@@ -81,7 +81,7 @@
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
             class="avatar-uploader"
-            action="/api/tea 。cher/uploadPicture">
+            action="/oes/api/teacher/uploadPicture">
             <img v-if="temp.imgSrc" :src="temp.imgSrc" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"/>
           </el-upload>
@@ -118,207 +118,207 @@
 </template>
 
 <script>
-import { reqGetRotationImgsList, reqSearchRotationImgsList, reqInsertRotationImgInfo, reqUpdateRotationImgInfo, reqDeleteRotationImg } from '@/api/rotationImg'
-import waves from '@/directive/waves' // Waves directive
-import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
-import BackToTop from '@/components/BackToTop'
-export default {
-  name: 'RotationTable',
-  components: { Pagination, BackToTop },
-  directives: { waves },
-  data() {
-    return {
-      tableKey: 0,
-      list: null,
-      previewList: [],
-      total: 0,
-      listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 10,
-        imgTitle: undefined,
-        admName: undefined
-      },
-      temp: {
-        imgTitle: '',
-        imgSrc: ''
-      },
-      dialogFormVisible: false,
-      dialogStatus: '',
-      dialogRotationImgVisible: false,
-      rules: {
-        imgTitle: [{ required: true, message: '图片标题为必填项', trigger: 'change' }],
-        imgSrc: [{ required: true, message: '请上传轮播图片', trigger: 'change' }]
-      },
-      myBackToTopStyle: {
-        right: '50px',
-        bottom: '50px',
-        width: '40px',
-        height: '40px',
-        'border-radius': '4px',
-        'line-height': '45px', // 请保持与高度一致以垂直居中 Please keep consistent with height to center vertically
-        background: '#e7eaf1'// 按钮的背景颜色 The background color of the button
-      }
-    }
-  },
-  created() {
-    this.getList()
-  },
-  methods: {
-    async getList() {
-      this.listLoading = true
-      const result = await reqGetRotationImgsList()
-      if (result.statu === 0) {
-        this.total = result.data.length
-        this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
-      }
-      // 延迟0.5秒等待请求数据
-      setTimeout(() => {
-        this.listLoading = false
-      }, 500)
-    },
-    confirmDeleteRotationImg(row) {
-      this.$confirm('确定删除该轮播图吗?', '提示', {
-        confirmButtonText: '确定删除',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.handleDeleteRotationImg(row)
-      }).catch(() => {
-      })
-    },
-    async handleDeleteRotationImg(row) {
-      const result = await reqDeleteRotationImg(row.imgId)
-      if (result.statu === 0) {
-        this.$message({
-          message: '删除成功',
-          type: 'success'
-        })
-        this.getList()
-      } else {
-        this.$message({
-          message: result.msg,
-          type: 'error'
-        })
-      }
-    },
-    async handleFilter() {
-      this.listQuery.page = 1
-      this.listLoading = true
-      const result = await reqSearchRotationImgsList(this.listQuery.imgTitle, this.listQuery.admName)
-      if (result.statu === 0) {
-        this.total = result.data.length
-        this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
-      }
-      // 延迟一秒等待请求数据
-      setTimeout(() => {
-        this.listLoading = false
-      }, 500)
-    },
-    resetTemp() {
-      this.temp = {
-        imgTitle: '',
-        imgSrc: ''
-      }
-    },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row) // 复制对象
-      this.dialogStatus = '编辑'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.handleUpdateRotationImg()
+  import { reqGetRotationImgsList, reqSearchRotationImgsList, reqInsertRotationImgInfo, reqUpdateRotationImgInfo, reqDeleteRotationImg } from '@/api/rotationImg'
+  import waves from '@/directive/waves' // Waves directive
+  import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+  import BackToTop from '@/components/BackToTop'
+  export default {
+    name: 'RotationTable',
+    components: { Pagination, BackToTop },
+    directives: { waves },
+    data() {
+      return {
+        tableKey: 0,
+        list: null,
+        previewList: [],
+        total: 0,
+        listLoading: true,
+        listQuery: {
+          page: 1,
+          limit: 10,
+          imgTitle: undefined,
+          admName: undefined
+        },
+        temp: {
+          imgTitle: '',
+          imgSrc: ''
+        },
+        dialogFormVisible: false,
+        dialogStatus: '',
+        dialogRotationImgVisible: false,
+        rules: {
+          imgTitle: [{ required: true, message: '图片标题为必填项', trigger: 'change' }],
+          imgSrc: [{ required: true, message: '请上传轮播图片', trigger: 'change' }]
+        },
+        myBackToTopStyle: {
+          right: '50px',
+          bottom: '50px',
+          width: '40px',
+          height: '40px',
+          'border-radius': '4px',
+          'line-height': '45px', // 请保持与高度一致以垂直居中 Please keep consistent with height to center vertically
+          background: '#e7eaf1'// 按钮的背景颜色 The background color of the button
         }
-      })
-    },
-    async handleUpdateRotationImg() {
-      const result = await reqUpdateRotationImgInfo(this.temp)
-      if (result.statu === 0) {
-        this.dialogFormVisible = false
-        this.$message({
-          message: result.msg,
-          type: 'success'
-        })
-        this.getList()
-      } else {
-        this.$message({
-          message: result.msg,
-          type: 'error'
-        })
       }
     },
-    handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = '添加'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+    created() {
+      this.getList()
     },
-    createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.insertRotationImgInfo()
+    methods: {
+      async getList() {
+        this.listLoading = true
+        const result = await reqGetRotationImgsList()
+        if (result.statu === 0) {
+          this.total = result.data.length
+          this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
         }
-      })
-    },
-    async insertRotationImgInfo() {
-      const temp = this.temp
-      const admin = this.$store.state.admin.userInfo
-      temp.ano = admin.ano
-      temp.admName = admin.admName
-      const result = await reqInsertRotationImgInfo(temp)
-      if (result.statu === 0) {
-        this.dialogFormVisible = false
-        this.$notify({
-          title: '成功',
-          message: '添加成功',
-          type: 'success',
-          duration: 2000
+        // 延迟0.5秒等待请求数据
+        setTimeout(() => {
+          this.listLoading = false
+        }, 500)
+      },
+      confirmDeleteRotationImg(row) {
+        this.$confirm('确定删除该轮播图吗?', '提示', {
+          confirmButtonText: '确定删除',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.handleDeleteRotationImg(row)
+        }).catch(() => {
         })
-        this.getList()
-      } else {
-        this.$notify({
-          title: '失败',
-          message: result.msg,
-          type: 'error',
-          duration: 2000
+      },
+      async handleDeleteRotationImg(row) {
+        const result = await reqDeleteRotationImg(row.imgId)
+        if (result.statu === 0) {
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+          this.getList()
+        } else {
+          this.$message({
+            message: result.msg,
+            type: 'error'
+          })
+        }
+      },
+      async handleFilter() {
+        this.listQuery.page = 1
+        this.listLoading = true
+        const result = await reqSearchRotationImgsList(this.listQuery.imgTitle, this.listQuery.admName)
+        if (result.statu === 0) {
+          this.total = result.data.length
+          this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
+        }
+        // 延迟一秒等待请求数据
+        setTimeout(() => {
+          this.listLoading = false
+        }, 500)
+      },
+      resetTemp() {
+        this.temp = {
+          imgTitle: '',
+          imgSrc: ''
+        }
+      },
+      handleUpdate(row) {
+        this.temp = Object.assign({}, row) // 复制对象
+        this.dialogStatus = '编辑'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
         })
-      }
-    },
-    async handlePreview() {
-      const result = await reqGetRotationImgsList()
-      if (result.statu === 0) {
-        this.previewList = result.data
-      }
-      this.dialogRotationImgVisible = true
-    },
-    handleAvatarSuccess(res, file) {
-      // this.temp.pictureSrc = URL.createObjectURL(file.raw)
-      this.temp.imgSrc = res.data
-    },
-    beforeAvatarUpload(file) {
-      const isType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif'
-      const isLt4M = file.size / 1024 / 1024 < 4
+      },
+      updateData() {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.handleUpdateRotationImg()
+          }
+        })
+      },
+      async handleUpdateRotationImg() {
+        const result = await reqUpdateRotationImgInfo(this.temp)
+        if (result.statu === 0) {
+          this.dialogFormVisible = false
+          this.$message({
+            message: result.msg,
+            type: 'success'
+          })
+          this.getList()
+        } else {
+          this.$message({
+            message: result.msg,
+            type: 'error'
+          })
+        }
+      },
+      handleCreate() {
+        this.resetTemp()
+        this.dialogStatus = '添加'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
+      },
+      createData() {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.insertRotationImgInfo()
+          }
+        })
+      },
+      async insertRotationImgInfo() {
+        const temp = this.temp
+        const admin = this.$store.state.admin.userInfo
+        temp.ano = admin.ano
+        temp.admName = admin.admName
+        const result = await reqInsertRotationImgInfo(temp)
+        if (result.statu === 0) {
+          this.dialogFormVisible = false
+          this.$notify({
+            title: '成功',
+            message: '添加成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.getList()
+        } else {
+          this.$notify({
+            title: '失败',
+            message: result.msg,
+            type: 'error',
+            duration: 2000
+          })
+        }
+      },
+      async handlePreview() {
+        const result = await reqGetRotationImgsList()
+        if (result.statu === 0) {
+          this.previewList = result.data
+        }
+        this.dialogRotationImgVisible = true
+      },
+      handleAvatarSuccess(res, file) {
+        // this.temp.pictureSrc = URL.createObjectURL(file.raw)
+        this.temp.imgSrc = res.data
+      },
+      beforeAvatarUpload(file) {
+        const isType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif'
+        const isLt4M = file.size / 1024 / 1024 < 4
 
-      if (!isType) {
-        this.$message.error('上传头像图片只能是 JPG/PNG/GIF 格式!')
+        if (!isType) {
+          this.$message.error('上传头像图片只能是 JPG/PNG/GIF 格式!')
+        }
+        if (!isLt4M) {
+          this.$message.error('上传头像图片大小不能超过 4MB!')
+        }
+        return isType && isLt4M
+      },
+      deletePictureSrc() {
+        this.temp.imgSrc = ''
       }
-      if (!isLt4M) {
-        this.$message.error('上传头像图片大小不能超过 4MB!')
-      }
-      return isType && isLt4M
-    },
-    deletePictureSrc() {
-      this.temp.imgSrc = ''
     }
   }
-}
 </script>
 <style rel="stylesheet/scss" lang="scss" type="text/scss" scoped>
   .avatar-uploader .el-upload {
